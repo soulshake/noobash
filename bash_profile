@@ -1,26 +1,218 @@
-# export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
-# export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
-PATH=/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/local/MacGPG2/bin
+#------------------------------------------------------------------------------------------
+# THIS IS MY BASH PROFILE.
+# THERE ARE MANY LIKE IT BUT THIS ONE IS MINE.
+#------------------------------------------------------------------------------------------
 
-# source ~/.bash_profile
+export PATH=$HOME/bin:/bin:/opt/local/bin:/opt/local/sbin:/sbin:/usr/X11/bin:/usr/bin:/usr/local/MacGPG2/bin:/usr/local/bin:/usr/sbin:$PATH
 
-# Make the command prompt GREEN
-# PS1='\h:\W \u\$ '
- 
+
+#------------------------------------------------------------------------------------------
+# ALIASES
+#------------------------------------------------------------------------------------------
+
+
+# GWHOIS: Use Gandi's whois
+alias gwhois='whois -h whois.gandi.net'
+
+
+# alias aliases='xterm -e vim ~/.bash_aliases;reload'
+alias reload='. ~/.bash_profile'
+
+
+# Don't do something you regret.
+alias rm='rm -i' 
+alias cp='cp -i'
+alias mv='mv -i'
+
+alias mkdir='mkdir -v'
+# alias echo -e ${PATH//:/\\n}
+# alias libpath='echo -e ${LD_LIBRARY_PATH//:/\\n}' # I don't even...?
+
+
+
+
+# Move up directories more easily
+alias ..='cd ..' 
+alias ...='cd ../..' 
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+
+
+
+#------------------------------------------------------------------------------------------
+# FUNCTIONS
+#------------------------------------------------------------------------------------------
+
+# Reverse DNS lookup without having to retype the IP
+function rhost () {
+	host $1|head -1|cut -d ' ' -f 4|xargs host
+}
+
+# host $(dig squirrel.li +short)
+
+
+function extract() # Handy Extract Program. 
+{
+     if [ -f $1 ] ; then
+         case $1 in
+             *.tar.bz2) tar xvjf $1 ;;
+             *.tar.gz) tar xvzf $1 ;;
+             *.bz2) bunzip2 $1 ;;
+             *.rar) unrar x $1 ;;
+             *.gz) gunzip $1 ;;
+             *.tar) tar xvf $1 ;;
+             *.tbz2) tar xvjf $1 ;;
+             *.tgz) tar xvzf $1 ;;
+             *.zip) unzip $1 ;;
+             *.Z) uncompress $1 ;;
+             *.7z) 7z x $1 ;;
+             *) echo "'$1' cannot be extracted via >extract<" ;;
+         esac
+     else
+         echo "'$1' is not a valid file"
+     fi
+}
+
+
+
+#------------------------------------------------------------------------------------------
+#  LINE COLOR (a.k.a status_style)
+#------------------------------------------------------------------------------------------
+
+# 1 = line color
+# .................................1111....
+# status_style=$reset_style'\[\033[0;90m\]' # gray color; use 0;37m for lighter color <== BACKUP
+status_style=$reset_style'\[\033[0;35m\]' # purple color
+
+
+
+#------------------------------------------------------------------------------------------
+#  PROMPT COLOR (a.k.a. prompt_style)
+#------------------------------------------------------------------------------------------
+
+# prompt_style=$reset_style <== BACKUP
+prompt_style=$reset_style'\[\033[0;32m\]'
+
+
+#------------------------------------------------------------------------------------------
+#  TYPING COLOR (a.k.a. command_style)
+#------------------------------------------------------------------------------------------
+
+# 1=typing color
+# ..................................1111.............................................. 
+# command_style=$reset_style'\[\033[1;29m\]' # bold black <== BACKUP
+command_style=$reset_style'\[\033[1;33m\]' # whitish-yellow
+
+
+#------------------------------------------------------------------------------------------
+#  PROMPT (a.k.a. PS1)
+#------------------------------------------------------------------------------------------
+
+# Prompt variable: 
+# 3=username; 4=hostname; 5=absolute path
+# ..................................................................................3..4..5............................... 
+# PS1="$status_style"'$fill \t\n'"$prompt_style"'${debian_chroot:+($debian_chroot)}\u@\h:\w\$'"$command_style " <=== BACKUP
+PS1="$status_style"'$fill \t\n'"$prompt_style"'${debian_chroot:+($debian_chroot)}\u@\h:\w\$'"$command_style "
+
+
+# Reset color for command output
+# (this one is invoked every time before a command is executed):
+trap 'echo -ne "\033[00m"' DEBUG
+
+
+#------------------------------------------------------------------------------------------
+#  SEPARATOR LINE
+#------------------------------------------------------------------------------------------
+
+# Fill with minuses
+# (this is recalculated every time the prompt is shown in function prompt_command):
+
+fill="--- "
+reset_style='\[\033[00m\]'
+
+function prompt_command {
+# create a $fill of all screen width minus the time string and a space:
+	let fillsize=${COLUMNS}-9
+	fill=""
+	while [ "$fillsize" -gt "0" ]
+	do
+	fill="-${fill}" # fill with underscores/hyphens/tildes to work on
+	let fillsize=${fillsize}-1
+	done
+}
+
+PROMPT_COMMAND=prompt_command
+
+
+#------------------------------------------------------------------------------------------
+# INCREMENTAL HISTORY SEARCH (?)
+# "Add this to your .bashrc and you will be very happy" by Jeet
+#------------------------------------------------------------------------------------------
+
+## Up Arrow: search and complete from previous history
+# bind '"\eOA": history-search-backward'
+## alternate, if the above does not work for you:
+bind '"\e[A":history-search-backward'
+
+## Down Arrow: search and complete from next history
+# bind '"\eOB": history-search-forward'
+## alternate, if the above does not work for you:
+bind '"\e[B":history-search-forward'
+# Hat tip to http://osxdaily.com/2011/10/03/add-a-separator-time-stamp-between-terminal-commands-to-increase-readability/
+
+#------------------------------------------------------------------------------------------
+#  OTHER STUFF
+#------------------------------------------------------------------------------------------
+
+# Tell ls to be colourful
+export CLICOLOR=1
+# export LSCOLORS=Exfxcxdxbxegedabagacad # Change the colors used by ls
+
+# Tell grep to highlight matches
+export GREP_OPTIONS='--color=auto'
+# source "`port --prefix grc`/etc/grc.bashrc" #failed attempt at adding Generic Colouriser
+
+
 # Carefully set the current working directory as a classpath
 # SET CLASSPATH=%CLASSPATH%:.
 
-############################################
-# Obtained from http://osxdaily.com/2011/10/03/add-a-separator-time-stamp-between-terminal-commands-to-increase-readability/
-# Modified from emilis bash prompt script
-# from https://github.com/emilis/emilis-config/blob/master/.bash_ps1
-# Modified for Mac OS X by
-# @corndogcomputer
-# Modified for ME by ME
-###########################################
+
+if [ -f /opt/local/etc/bash_completion ]; then
+    . /opt/local/etc/bash_completion
+fi
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ REFERENCE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+#------------------------------------------------------------------------------------------
+# COLOR REFERENCE
+#------------------------------------------------------------------------------------------
+
+
+# Define some colors first:
+red='\e[0;31m' 
+RED='\e[1;31m' 
+blue='\e[0;34m' 
+BLUE='\e[1;34m' 
+cyan='\e[0;36m' 
+CYAN='\e[1;36m'
+NC='\e[0m'              # No Color
+
+
+DARKGRAY='\e[1;30m' 
+LIGHTRED='\e[1;31m' 
+GREEN='\e[32m' 
+YELLOW='\e[1;33m' 
+LIGHTBLUE='\e[1;34m' 
+# NC='\e[m'
+
+
+# For example:
+# PS1="\n$GREEN[\w] \n$DARKGRAY($PCT\t$DARKGRAY)-($PCT\u$DARKGRAY)-($PCT\!
+# $DARKGRAY)$YELLOW-> $NC"
+
+# Source: http://tldp.org/LDP/abs/html/sample-bashrc.html
+
 #    Black       0;30     Dark Gray     1;30
 #    Blue        0;34     Light Blue    1;34
 #    Green       0;32     Light Green   1;32
@@ -44,115 +236,5 @@ PATH=/opt/local/bin:/opt/local/sbin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin
 #    \[\e[0m\] - another non-printing sequence; this one sets the colors back to the defaults, so only the prompt is yellow-on-red
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Fill with minuses
-
-# (this is recalculated every time the prompt is shown in function prompt_command):
-
-fill="--- "
-reset_style='\[\033[00m\]'
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LINE COLOR (a.k.a status_style) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 1 = line color
-# .................................1111....
-# status_style=$reset_style'\[\033[0;90m\]' # gray color; use 0;37m for lighter color <== BACKUP
-status_style=$reset_style'\[\033[0;35m\]' # purple color
-
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROMPT COLOR (a.k.a. prompt_style) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# prompt_style=$reset_style <== BACKUP
-prompt_style=$reset_style'\[\033[0;32m\]'
-
-
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TYPING COLOR (a.k.a. command_style) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 1=typing color
-# ..................................1111.............................................. 
-# command_style=$reset_style'\[\033[1;29m\]' # bold black <== BACKUP
-command_style=$reset_style'\[\033[1;33m\]' # whitish-yellow
-
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROMPT (a.k.a. PS1) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# Prompt variable: 
-# 3=username; 4=hostname; 5=absolute path
-# ..................................................................................3..4..5............................... 
-# PS1="$status_style"'$fill \t\n'"$prompt_style"'${debian_chroot:+($debian_chroot)}\u@\h:\w\$'"$command_style " <=== BACKUP
-PS1="$status_style"'$fill \t\n'"$prompt_style"'${debian_chroot:+($debian_chroot)}\u@\h:\w\$'"$command_style "
-
-
-# Reset color for command output
-# (this one is invoked every time before a command is executed):
-trap 'echo -ne "\033[00m"' DEBUG
-
-
-# @@@@ TEST @@@@
-# CURRENTUSER=`whoami`
-# if [ "$CURRENTUSER" = "root" ]; then
-#   PS1='\[\033[1;31m\]\u@myhost:\w #\[\033[0m\] '
-# else
-#   PS1='\u@myhost:\w> '
-# fi
-# @@@@ endTEST @@@@
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SEPARATOR LINE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-function prompt_command {
-
-# create a $fill of all screen width minus the time string and a space:
- 
-let fillsize=${COLUMNS}-9
-fill=""
-while [ "$fillsize" -gt "0" ]
-do
-fill="-${fill}" # fill with underscores/hyphens/tildes to work on
-let fillsize=${fillsize}-1
-done
-
-# If this is an xterm set the title to user@host:dir
-
-# case "$TERM" in
-# xterm*|rxvt*)
-# bname=`basename "${PWD/$HOME/~}"`
-# echo -ne "\033]0;${bname}: ${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"
-# ;;
-# *)
-# ;;
-# esac
-}
-
-PROMPT_COMMAND=prompt_command
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ OTHER STUFF ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# export SUDO_PS1="\[\e[33;1;41m\][\u] \w \$\[\e[0m\] " # Trying to make root prompt red
-
-
-
-# Tell ls to be colourful
-export CLICOLOR=1
-# export LSCOLORS=Exfxcxdxbxegedabagacad # Change the colors used by ls
-
-# Tell grep to highlight matches
-export GREP_OPTIONS='--color=auto'
-# source "`port --prefix grc`/etc/grc.bashrc" #failed attempt at adding Generic Colouriser
-
-
-
-# Jeet's thing
-## Up Arrow: search and complete from previous history
-# bind '"\eOA": history-search-backward'
-## alternate, if the above does not work for you:
-bind '"\e[A":history-search-backward'
-
-## Down Arrow: search and complete from next history
-# bind '"\eOB": history-search-forward'
-## alternate, if the above does not work for you:
-bind '"\e[B":history-search-forward'
